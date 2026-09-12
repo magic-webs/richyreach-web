@@ -141,16 +141,15 @@ export default function AdminNotificationsPage() {
       }
       return json as any;
     },
-    onSuccess: () => {
-      const label =
-        targetMode === "all"
-          ? "all users"
-          : targetMode === "brands"
-          ? "all brands"
-          : targetMode === "influencers"
-          ? "all influencers"
-          : `${selectedUserIds.length} user${selectedUserIds.length === 1 ? "" : "s"}`;
-      toast.success(`Broadcast queued for ${label}`);
+    onSuccess: (json) => {
+      // The backend now sends the push before responding and reports what reached a device,
+      // so show that instead of a "queued" message that was true even when nothing landed.
+      const summary = json?.data as { recipients: number; devices: number; sent: number; failed: number } | undefined;
+      if (summary && summary.sent === 0) {
+        toast.warning(json?.message || "Saved to the in-app inbox, but no device received a push.");
+      } else {
+        toast.success(json?.message || "Notification sent");
+      }
       resetForm();
     },
     onError: (err: any) => {
