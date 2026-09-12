@@ -44,6 +44,9 @@ const NOTIFICATION_TYPES = [
   { value: "profile", label: "Profile" },
 ] as const;
 
+/** Past this, an Android notification image is likely to be dropped when it is decoded. */
+const NOTIFICATION_IMAGE_WARN_BYTES = 1024 * 1024;
+
 const TARGET_OPTIONS: { value: TargetMode; label: string }[] = [
   { value: "all", label: "All users" },
   { value: "brands", label: "All brands" },
@@ -240,7 +243,15 @@ export default function AdminNotificationsPage() {
                 url={imageUrl}
                 onFileChange={(file) => {
                   setImageFile(file);
-                  if (file) uploadImageMutation.mutate(file);
+                  if (!file) return;
+                  // Android decodes the image into a notification bitmap and drops it when
+                  // it is too heavy, so a multi-megabyte upload silently loses the picture.
+                  if (file.size > NOTIFICATION_IMAGE_WARN_BYTES) {
+                    toast.warning(
+                      `That image is ${(file.size / 1024 / 1024).toFixed(1)} MB. Notification images over 1 MB often fail to render on Android — resize it to roughly 1024x512 first.`
+                    );
+                  }
+                  uploadImageMutation.mutate(file);
                 }}
                 onUrlChange={setImageUrl}
                 fileLabel="Upload Image"
