@@ -162,7 +162,7 @@ export default function CreateCampaignPage() {
             title: aiTitle,
             description: aiDescription,
             arenaType: "reel_reach",
-            entryFeeCoins: 2000,
+            entryFeeCoins: 0,
             totalBudgetCoins: budgetCents,
             maxParticipants: 100,
             startDate: new Date().toISOString().split('T')[0],

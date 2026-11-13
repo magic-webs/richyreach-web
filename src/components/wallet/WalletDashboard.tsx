@@ -22,7 +22,11 @@ type WalletData = {
   transactions: Transaction[];
 };
 
-export function WalletDashboard() {
+/**
+ * `canAddFunds` is false for creators: they earn coins from brands and can't buy them,
+ * because arenas are free to enter and coins have nothing else to pay for.
+ */
+export function WalletDashboard({ canAddFunds = true }: { canAddFunds?: boolean }) {
   const queryClient = useQueryClient();
   const [addAmount, setAddAmount] = useState<string>("500");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -157,6 +161,7 @@ export function WalletDashboard() {
           </CardContent>
         </Card>
 
+        {canAddFunds && (
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-lg">Add Funds</CardTitle>
@@ -183,6 +188,7 @@ export function WalletDashboard() {
             </form>
           </CardContent>
         </Card>
+        )}
       </div>
 
       <Card className="shadow-md">
